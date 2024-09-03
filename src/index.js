@@ -14,17 +14,14 @@ const dataa = {
   employeesName: ['ime', 'ime2', 'prezime2', 'prezime3', 'pre4'],
   morningShift: "8AM-4PM",
   afternoonShift: null,
-  nightShift: "1PM-9PM"// No night shift
+  nightShift: "1PM-9PM"
 };
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-
 app.get('/', (req, res) => {
   res.send('Hello world!')
 })
-
-
 
 app.post("/authuser", async (req, res) => {
     let user = req.body;
@@ -37,8 +34,6 @@ app.post("/authuser", async (req, res) => {
     }
   });
 
-
-  
 app.post("/createuser", async (req, res) => {
     let user = req.body;
     try{
@@ -49,11 +44,9 @@ app.post("/createuser", async (req, res) => {
     }
   });
   
-
-// Funkcija za kreiranje rasporeda
 function createWeeklySchedule(data) {
     const { employees } = data;
-    const shifts = [1, 2, 3]; // 1 = morningShift, 2 = afternoonShift, 3 = nightShift
+    const shifts = [1, 2, 3];
 
     const schedule = {};
 
@@ -63,12 +56,10 @@ function createWeeklySchedule(data) {
             offDuty: []
         };
 
-        // Filter zaposlenih za svaku smenu na osnovu nedostupnosti
         shifts.forEach(shift => {
             const availableEmployees = employees.filter(employee => {
-                // Provera da li postoji `unavailableDays` i da li je niz
                 if (!employee.unavailableDays || !Array.isArray(employee.unavailableDays)) {
-                    return true; // Ako nije definisano, znači da je dostupan
+                    return true; 
                 }
 
                 return !employee.unavailableDays.some(unavailable => 
@@ -78,13 +69,12 @@ function createWeeklySchedule(data) {
 
             if (availableEmployees.length > 0) {
                 schedule[day].shifts[shift] = availableEmployees[0].name;
-                employees.push(employees.shift()); // rotacija zaposlenih
+                employees.push(employees.shift());
             } else {
-                schedule[day].shifts[shift] = "N/A"; // Nema dostupnih radnika
+                schedule[day].shifts[shift] = "N/A";
             }
         });
 
-        // Popunjavanje slobodnih radnika
         const workingEmployees = Object.values(schedule[day].shifts);
         schedule[day].offDuty = employees
             .map(emp => emp.name)
@@ -94,11 +84,9 @@ function createWeeklySchedule(data) {
     return schedule;
 }
 
-// Endpoint za generisanje rasporeda
 app.post('/schedule', (req, res) => {
     const data = req.body;
 
-    // Provera da li `employees` postoji i da li je niz
     if (!data.employees || !Array.isArray(data.employees)) {
         return res.status(400).json({ error: 'Invalid input: employees should be an array.' });
     }
